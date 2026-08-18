@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elecciones Mecateñas 2026</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🗳️ Elecciones Mecateñas 2026 🗳️</h1>
+    <p class="subtitle">¿Quién merece más su voto entre estos dos candidatos?</p>
+    <nav>
+      <button id="btn-vote" class="active">Votar</button>
+      <button id="btn-leaderboard">Tarjetón general</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="battle">
+      <p class="loading">Convocando candidatos…</p>
+    </section>
+
+    <section id="leaderboard" hidden>
+      <h2>Tarjetón general</h2>
+      <ol id="leaders"></ol>
+    </section>
+  </main>
+
+  <footer>
+    <p>Universidad del Valle · Javeriana Cali · ICESI · Infraestructuras Paralelas y Distribuidas · Ejercicio 5</p>
+    <p class="disclaimer">Este es un ejercicio académico. Todos los candidatos son ficticios y cualquier parecido con la realidad es pura mecateada.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

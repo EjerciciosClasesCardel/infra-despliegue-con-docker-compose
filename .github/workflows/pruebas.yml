@@ -1,0 +1,65 @@
+name: Pruebas
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  despliegue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir las imágenes
+        run: docker compose build
+
+      - name: Levantar los servicios con healthchecks
+        run: docker compose up -d --wait --wait-timeout 90
+
+      - name: El frontend responde HTML en el 8080
+        run: |
+          for i in $(seq 1 20); do
+            body=$(curl -fsS http://localhost:8080/ 2>/dev/null) && \
+              echo "$body" | grep -qi '<html' && exit 0
+            sleep 2
+          done
+          docker compose ps
+          docker compose logs --tail 60
+          exit 1
+
+      - name: El proxy llega a /api/health del backend
+        run: |
+          for i in $(seq 1 20); do
+            body=$(curl -fsS http://localhost:8080/api/health 2>/dev/null) && \
+              echo "$body" | grep -q '"status"[[:space:]]*:[[:space:]]*"ok"' && exit 0
+            sleep 2
+          done
+          docker compose ps
+          docker compose logs --tail 60
+          exit 1
+
+      - name: /api/battle devuelve dos candidatos desde Postgres
+        run: |
+          body=$(curl -fsS http://localhost:8080/api/battle)
+          count=$(printf '%s' "$body" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+          test "$count" -eq 2 || { echo "esperado 2, obtenido $count: $body"; exit 1; }
+
+      - name: POST /api/vote actualiza el tarjetón
+        run: |
+          set -euo pipefail
+          battle=$(curl -fsS http://localhost:8080/api/battle)
+          winner=$(printf '%s' "$battle" | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['id'])")
+          loser=$(printf '%s'  "$battle" | python3 -c "import sys,json; print(json.load(sys.stdin)[1]['id'])")
+          before=$(curl -fsS http://localhost:8080/api/leaderboard | \
+            python3 -c "import sys,json; w=$winner; print([c['wins'] for c in json.load(sys.stdin) if c['id']==w][0])")
+          curl -fsS -X POST http://localhost:8080/api/vote \
+            -H 'Content-Type: application/json' \
+            -d "{\"winner_id\":$winner,\"loser_id\":$loser}"
+          after=$(curl -fsS http://localhost:8080/api/leaderboard | \
+            python3 -c "import sys,json; w=$winner; print([c['wins'] for c in json.load(sys.stdin) if c['id']==w][0])")
+          test $((after)) -eq $((before + 1)) || { echo "antes=$before despues=$after"; exit 1; }
+
+      - name: Apagar
+        if: always()
+        run: docker compose down -v || true
