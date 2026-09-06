@@ -85,20 +85,20 @@ Y el frontend lee:
 | `BACKEND_URL` | `http://backend:5000` | URL interna a la que se hace proxy |
 | `PORT` | `8080` | puerto donde escucha Express |
 
-## Lo que verifica el flujo de Actions (100 puntos)
+## Lo que verifica el flujo de Actions
 
 Los pasos van en orden: si la construcción de las imágenes falla, los demás no alcanzan a correr.
 
-| # | Step | Puntos | Verifica |
-|---|---|---|---|
-| 1 | `build`  | 20 | `docker compose build` termina sin errores |
-| 2 | `up`     | 15 | `docker compose up -d --wait --wait-timeout 90` deja todo healthy |
-| 3 | `web`    | 15 | `GET http://localhost:8080/` responde HTML |
-| 4 | `health` | 15 | `GET http://localhost:8080/api/health` responde `{"status":"ok"}` (frontend → backend → db) |
-| 5 | `battle` | 15 | `GET http://localhost:8080/api/battle` retorna **2** candidatos desde Postgres |
-| 6 | `vote`   | 20 | `POST http://localhost:8080/api/vote` incrementa el tarjetón |
+| # | Step | Verifica |
+|---|---|---|
+| 1 | `build`  | `docker compose build` termina sin errores |
+| 2 | `up`     | `docker compose up -d --wait --wait-timeout 90` deja todo healthy |
+| 3 | `web`    | `GET http://localhost:8080/` responde HTML |
+| 4 | `health` | `GET http://localhost:8080/api/health` responde `{"status":"ok"}` (frontend → backend → db) |
+| 5 | `battle` | `GET http://localhost:8080/api/battle` retorna **2** candidatos desde Postgres |
+| 6 | `vote`   | `POST http://localhost:8080/api/vote` incrementa el tarjetón |
 
-Para que el paso 2 (`up --wait`) sume puntos deben definir **healthchecks** en el
+Para que el paso 2 (`up --wait`) pase deben definir **healthchecks** en el
 compose; los pasos 3-6 dependen de que la red interna esté bien configurada.
 
 ## Pistas (no la solución)
