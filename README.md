@@ -59,6 +59,23 @@ Flujo: el navegador habla SOLO con el frontend en `localhost:8080`. El frontend
 hace proxy interno hacia `backend:5000`, y el backend consulta la base de datos
 en `db:5432`.
 
+## Requisitos
+
+| Qué | Linux (Debian/Ubuntu) | macOS | Windows |
+|---|---|---|---|
+| Docker Engine | repositorio oficial de Docker, según [docs.docker.com/engine/install](https://docs.docker.com/engine/install/) | Docker Desktop | Docker Desktop, sobre WSL2 |
+| Docker Compose (el plugin, `docker compose` con espacio) | `sudo apt install docker-compose-plugin` | incluido en Docker Desktop | incluido en Docker Desktop |
+| `curl`, para probar las rutas | `sudo apt install curl` | viene con el sistema | viene con Windows 10 y 11 |
+
+Se usa `docker compose` con espacio; el `docker-compose` con guion es la
+versión vieja y no entiende `--wait`. En Linux, `sudo usermod -aG docker
+$USER` y una sesión nueva evitan el `sudo` en cada comando. Los tres
+servicios se construyen igual en los tres sistemas; lo que cambia es la
+primera descarga de las imágenes base, que pesa unos cientos de megabytes.
+
+Los detalles de cada sistema están en
+[DOCUMENTACION.md](DOCUMENTACION.md), al final.
+
 ## Lo que ustedes deben entregar
 
 Tres archivos, ni uno más:
